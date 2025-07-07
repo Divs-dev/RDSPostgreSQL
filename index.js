@@ -3,7 +3,6 @@ const bodyParser = require('body-parser');
 const { Pool } = require('pg');
 const app = express();
 app.use(bodyParser.json());
-// Replace with your actual RDS PostgreSQL credentials
 const pool = new Pool({
   user: 'postgres',
   host: 'testdivdatabase-canada.cfg84o02o0vb.ca-central-1.rds.amazonaws.com',
@@ -11,18 +10,52 @@ const pool = new Pool({
   password: 'x6KJ4=+7',
   port: 5432,
 });
-app.post('/insert', async (req, res) => {
-  const { Id, Name, Field_Name__c, Action__c, Account__c, Lead__c, Funding__c, New_Value__c, Old_Value__c, CreatedDate, user__c } = req.body;
+app.post('/insertBatch', async (req, res) => {
+  const records = req.body;
+  const client = await pool.connect();
   try {
-    console.log('> '+req.body);
-    const result = await pool.query(
-      'INSERT INTO funding_flow (Id, Name, Field_Name__c, Action__c, Account__c, Lead__c, Funding__c, New_Value__c, Old_Value__c, CreatedDate, user__c) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',
-      [Id, Name, Field_Name__c, Action__c, Account__c, Lead__c, Funding__c, New_Value__c, Old_Value__c, CreatedDate, user__c]
-    );
-    res.status(200).json({ message: 'Data inserted successfully' });
+    await client.query('BEGIN');
+    for (const record of records) {
+      const {
+        Id,
+        Name,
+        Field_Name__c,
+        Action__c,
+        Account__c,
+        Lead__c,
+        Funding__c,
+        New_Value__c,
+        Old_Value__c,
+        CreatedDate,
+        user__c
+      } = record;
+      await client.query(
+        `INSERT INTO funding_flow
+        (Id, Name, Field_Name__c, Action__c, Account__c, Lead__c, Funding__c, New_Value__c, Old_Value__c, CreatedDate, user__c)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)`,
+        [
+          Id,
+          Name,
+          Field_Name__c,
+          Action__c,
+          Account__c,
+          Lead__c,
+          Funding__c,
+          New_Value__c,
+          Old_Value__c,
+          CreatedDate,
+          user__c
+        ]
+      );
+    }
+    await client.query('COMMIT');
+    res.status(200).json({ message: 'All records inserted successfully' });
   } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Error inserting data' });
+    await client.query('ROLLBACK');
+    console.error('Error inserting batch:', error);
+    res.status(500).json({ error: 'Failed to insert records' });
+  } finally {
+    client.release();
   }
 });
 app.listen(3000, () => {
