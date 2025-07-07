@@ -5,18 +5,18 @@ const app = express();
 app.use(bodyParser.json());
 // Replace with your actual RDS PostgreSQL credentials
 const pool = new Pool({
-  user: 'your_pg_user',
-  host: 'your-rds-endpoint.amazonaws.com',
-  database: 'your_db_name',
-  password: 'your_password',
+  user: 'postgres',
+  host: 'testdivdatabase-canada.cfg84o02o0vb.ca-central-1.rds.amazonaws.com',
+  database: 'SampleDBForCanada',
+  password: 'x6KJ4=+7',
   port: 5432,
 });
 app.post('/insert', async (req, res) => {
-  const { name, email } = req.body;
+  const { Id, Name, Field_Name__c, Action__c, Account__c, Lead__c, Funding__c, New_Value__c, Old_Value__c, CreatedDate, user__c } = req.body;
   try {
     const result = await pool.query(
-      'INSERT INTO contacts (name, email) VALUES ($1, $2)',
-      [name, email]
+      'INSERT INTO funding_flow (Id, Name, Field_Name__c, Action__c, Account__c, Lead__c, Funding__c, New_Value__c, Old_Value__c, CreatedDate, user__c) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)',
+      [Id, Name, Field_Name__c, Action__c, Account__c, Lead__c, Funding__c, New_Value__c, Old_Value__c, CreatedDate, user__c]
     );
     res.status(200).json({ message: 'Data inserted successfully' });
   } catch (error) {
