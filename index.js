@@ -34,7 +34,7 @@ const objName = ''+object;
       const placeholders = keys.map((_, idx) => `$${idx + 1}`).join(', '); // $1, $2, $3...
       console.log('object:: '+object);
       const query = `INSERT INTO ${objName} (${columns}) VALUES (${placeholders})`;
-
+console.log('query::::::  '+query);
       await client.query(query, values);
     }
 
