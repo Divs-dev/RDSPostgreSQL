@@ -28,8 +28,9 @@ app.post('/insertBatch', async (req, res) => {
     for (const record of records) {
       const keys = Object.keys(record); // dynamic field names
       const values = Object.values(record); // dynamic field values
+      const columns = keys.map(k => k.toLowerCase()).join(', ');
 
-      const columns = keys.map(k => `"${k}"`).join(', '); // wrap columns in quotes to support __c
+     // const columns = keys.map(k => `"${k}"`).join(', '); // wrap columns in quotes to support __c
       const placeholders = keys.map((_, idx) => `$${idx + 1}`).join(', '); // $1, $2, $3...
 
       const query = `INSERT INTO funding_flow (${columns}) VALUES (${placeholders})`;
