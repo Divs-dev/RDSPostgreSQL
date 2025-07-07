@@ -15,7 +15,7 @@ const pool = new Pool({
 
 app.post('/insertBatch', async (req, res) => {
   const {records,object} = req.body;
-
+objName = ''+object; 
   if (!records || !object || !Array.isArray(records) || records.length === 0) {
     return res.status(400).json({ error: 'No records provided' });
   }
@@ -33,7 +33,7 @@ app.post('/insertBatch', async (req, res) => {
      // const columns = keys.map(k => `"${k}"`).join(', '); // wrap columns in quotes to support __c
       const placeholders = keys.map((_, idx) => `$${idx + 1}`).join(', '); // $1, $2, $3...
       console.log('object:: '+object);
-      const query = `INSERT INTO `+object `+ (${columns}) VALUES (${placeholders})`;
+      const query = `INSERT INTO ${objName} (${columns}) VALUES (${placeholders})`;
 
       await client.query(query, values);
     }
