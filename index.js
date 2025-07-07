@@ -16,6 +16,7 @@ app.post('/insertBatch', async (req, res) => {
   try {
     await client.query('BEGIN');
     for (const record of records) {
+      console.log('record>> '+record);
       const {
         Id,
         Name,
