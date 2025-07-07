@@ -15,7 +15,7 @@ const pool = new Pool({
 
 app.post('/insertBatch', async (req, res) => {
   const {records,object} = req.body;
-objName = ''+object; 
+const objName = ''+object; 
   if (!records || !object || !Array.isArray(records) || records.length === 0) {
     return res.status(400).json({ error: 'No records provided' });
   }
@@ -29,7 +29,7 @@ objName = ''+object;
       const keys = Object.keys(record); // dynamic field names
       const values = Object.values(record); // dynamic field values
       const columns = keys.map(k => k.toLowerCase()).join(', ');
-
+      console.log('test::::::  ');
      // const columns = keys.map(k => `"${k}"`).join(', '); // wrap columns in quotes to support __c
       const placeholders = keys.map((_, idx) => `$${idx + 1}`).join(', '); // $1, $2, $3...
       console.log('object:: '+object);
